@@ -1,22 +1,22 @@
+/*global module*/
+
 const harden = Object.freeze;
 
-const todoPath = 'todo.txt';
-
-const checkFileName = (path) => {
-  if (path !== todoPath) {
+const checkFileName = (path, allowedPath) => {
+  if (path !== allowedPath) {
     throw Error(`This app does not have access to ${path}`);
   }
 };
 
-const attenuateFs = (originalFs) => harden({
+const attenuateFs = (originalFs, allowedPath) => harden({
   appendFile: (path, data, callback) => {
-    checkFileName(path);
+    checkFileName(path, allowedPath);
     return originalFs.appendFile(path, data, callback);
   },
   createReadStream: (path) => {
-    checkFileName(path);
+    checkFileName(path, allowedPath);
     return originalFs.createReadStream(path);
-  },
+  }
 });
 
 module.exports = attenuateFs;

@@ -1,3 +1,4 @@
+/*global require process*/
 // run from command line
 // takes an argument
 // saves it to file, appending it
@@ -25,25 +26,31 @@ const todoFile = 'todo.txt';
 
 const addTodoToFile = (todo, priority = 'Medium') => {
   altFs.appendFile(todoFile, `${priority}: ${todo} \n`, err => {
-    if (err) throw err;
+    if (err) { throw err; }
     console.log('Todo was added');
   });
 };
 
 const addTodo = args => {
-  const { todo, priority } = args;
+  const {todo, priority} = args;
   addTodoToFile(todo, priority);
 };
 
 const highlightTodo = todoLine => {
   const [priority, todo] = todoLine.split(': ');
   switch (priority) {
-    case 'High':
+    case 'High': {
       return chalk.red(todo);
-    case 'Medium':
+    }
+    case 'Medium': {
       return chalk.yellow(todo);
-    case 'Low':
+    }
+    case 'Low': {
       return chalk.green(todo);
+    }
+    default: {
+      throw new Error(`unrecognized priority ${priority}`);
+    }
   }
 };
 
@@ -52,19 +59,20 @@ const highlightTodo = todoLine => {
 
 const displayTodos = () => {
   try {
+    console.log(chalk.greenBright('****** TODAY\'S TODOS ********'));
     const stream = altFs.createReadStream(todoFile);
     const lineReader = require('readline').createInterface({
-      input: stream,
+      input: stream
     });
-    console.log(chalk.greenBright("****** TODAY'S TODOS ********"));
     lineReader.on('line', line => {
       console.log(highlightTodo(line));
     });
+    //lineReader.on('close', () => console.log('That\'s it!'));
   } catch (err) {
     console.log(
       chalk.red(
-        'There was an error, meaning that there was probably nothing to display. Please add a todo first',
-      ),
+        'There was an error, meaning that there was probably nothing to display. Please add a todo first'
+      )
     );
   }
 };
